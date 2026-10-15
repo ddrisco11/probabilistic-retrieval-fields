@@ -116,3 +116,31 @@ def test_router_learning_reduces_train_cross_entropy():
     t=region_targets(d['qrels'],l,8)
     _,h,_=fit_router(d,c,t,dict(hidden=16,lr=.01,weight_decay=0,epochs=12,batch_size=16),11)
     assert h[-1]['train_cross_entropy']<h[0]['train_cross_entropy']
+
+
+def test_searching_all_regions_matches_full_corpus():
+    from prf.regions import partition,region_targets,RegionRouter,evaluate_router
+    torch.set_num_threads(1)
+    d=synthetic(queries=60)
+    c,l=partition(d['documents'],4)
+    target=region_targets(d['qrels'],l,4)
+    _,regional=evaluate_router(d,c,l,target,RegionRouter(c),'centroid',4,11)
+    _,dense=evaluate(Policy(24,'dense'),d,d['splits']['test'],1,len(d['documents']))
+    for a,b in zip(regional,dense):
+        assert a['region_hit']==1 and a['answer_region_coverage']==pytest.approx(1)
+        assert a['corpus_fraction']==1
+        assert a['ranking']==b['ranking']
+        assert a['ndcg@10']==b['ndcg@10']
+
+
+def test_compressed_measurements_roundtrip(tmp_path):
+    import gzip,json
+    from prf.storage import save_region_results
+    original={'query_id':'q','total_ms':1.2,'region_hit':1.0,'ranking':['d']}
+    payload={'results':[dict(method='centroid',regions=4,probes=1,seed=11,per_query=[original])]}
+    save_region_results(payload,tmp_path)
+    with gzip.open(tmp_path/'per-query.jsonl.gz','rt') as f:restored=json.loads(f.readline())
+    for key,value in original.items():assert restored[key]==value
+    summary=json.loads((tmp_path/'results.json').read_text())
+    assert summary['results'][0]['p95_ms']==1.2
+    assert 'per_query' not in summary['results'][0]
