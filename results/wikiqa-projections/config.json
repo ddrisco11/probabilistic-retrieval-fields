@@ -1,0 +1,34 @@
+{
+  "models": [
+    {
+      "heads": 1,
+      "gate": "softmax"
+    },
+    {
+      "heads": 4,
+      "gate": "softmax"
+    },
+    {
+      "heads": 8,
+      "gate": "softmax"
+    },
+    {
+      "heads": 8,
+      "gate": "sparsemax"
+    }
+  ],
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "hidden": 64,
+  "epochs": 60,
+  "batch_size": 64,
+  "lr": 0.001,
+  "reward": "negative squared Euclidean distance between normalized destination and answer",
+  "positive_reduction": "uniform mean over labeled relevant answers",
+  "head_reduction": "sum of every weight times its reward; no mass cutoff",
+  "checkpoint": "lowest validation expected distance including initialization",
+  "ranking": "negative expected squared distance across all heads"
+}

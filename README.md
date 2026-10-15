@@ -10,6 +10,26 @@ This project explores retrieval adaptation over **frozen BGE-small embeddings**.
 
 ![Question-to-region retrieval architecture](docs/assets/architecture.png)
 
+## Continuous weighted projections
+
+The latest experiment directly predicts continuous destinations from each frozen query vector, with a learned weight for each destination. It uses **every weight**: the reward is the sum of each weight times negative squared distance to the relevant answer. There is no 95% cutoff. An optional sparse gate can learn exact zero weights, selecting an active subset of up to eight predictions.
+
+[Interactive projection weights](https://ddrisco11.github.io/probabilistic-retrieval-fields/projections.html) · [Full protocol and mathematical limits](docs/projections_protocol.md) · [Measured results](results/wikiqa-projections/summary.md)
+
+| Model | Expected squared distance ↓ | nDCG@10 ↑ | Mean active predictions |
+|---|---:|---:|---:|
+| Frozen BGE | 0.5442 | 0.7281 | 1.00 |
+| One learned projection | 0.4198 | 0.6820 | 1.00 |
+| Four weighted projections | 0.4198 | 0.6852 | 4.00 |
+| Eight weighted projections | 0.4199 | 0.6833 | 8.00 |
+| Eight projections with sparse weights | 0.4195 | 0.6832 | 4.03 |
+
+Three training seeds took 48.5 seconds total with cached embeddings. Training improved the intended distance reward, but worsened retrieval ranking. Multiple destinations became nearly identical. The sparse model's nDCG difference from the single projection was +0.0013, with query-paired 95% bootstrap interval [−0.0010, +0.0038], providing no clear multi-projection advantage here.
+
+![Continuous weighted projection measurements](docs/assets/projections.png)
+
+For squared distance, the weighted score ranks answers exactly like a single weighted-average vector. All probability mass is retained in this reduction. This limits the objective's ability to exploit distinct modes; a nonlinear distance reward would be a separate experiment. The region experiments below remain available as an earlier formulation.
+
 ## Why this is useful to investigate
 
 Fine-tuning an encoder can align queries with domain-specific documents, but it adds training cost and can require re-embedding the corpus. A small router offers a different adaptation point: keep the encoder and document vectors fixed, and learn which parts of that space deserve attention.
