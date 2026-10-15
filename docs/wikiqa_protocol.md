@@ -43,3 +43,13 @@ The router is corpus/partition-specific. It is not pretrained for arbitrary futu
 ## Upstream model exposure
 
 This experiment does not audit BGE's pretraining/fine-tuning data for prior exposure to WikiQA or related Wikipedia text. It establishes the router's held-out-question protocol, not a claim that the frozen encoder has never encountered the benchmark. A second dataset and an out-of-domain test would strengthen generalization evidence.
+
+## Fine-granularity follow-up
+
+The follow-up keeps the same frozen BGE cache, official question splits, 64-unit router, optimization settings, partition seed and three training seeds. It tests 1,000, 4,096 and 8,192 regions. Probe budgets extend to 128, 512 and 1,024 respectively so that coarse and fine partitions can be compared at overlapping corpus-search fractions. Regions and probes are distinct: increasing region count makes cells smaller; increasing probes searches more cells.
+
+For these larger partitions, k-means++ initialization incrementally maintains each document's distance to its nearest chosen center. This uses the same mathematical initialization criterion while avoiding recomputation against every previously chosen center. The original experiment retains its original initialization code path for reproducibility. Floating-point differences between paths can affect assignments; saved partition hashes identify the actual partitions.
+
+These are additional exploratory tests on the previously inspected test split, not an independent confirmation dataset. Granularity settings were specified before inspecting their outcomes; no post-result tuning of the router is included. The number of training-supported cells, median documents per cell and fraction of test answers in unsupported cells are recorded in `granularity-diagnostics.json`. These support counts are diagnostic, not training input.
+
+The fine-grained model remains a region classifier with a learned correction to centroid scores. It does not generate multiple continuous query displacement vectors. Consequently, these results test the granularity hypothesis for this classifier, not every possible multi-destination adapter.

@@ -12,13 +12,20 @@ from torch.nn import functional as F
 from .retrieval import metrics, paired_bootstrap
 
 
-def partition(documents,k,seed=2026,iterations=40):
+def partition(documents,k,seed=2026,iterations=40,incremental=False):
     if not 1<=k<=len(documents):raise ValueError('Invalid region count')
     g=torch.Generator().manual_seed(seed)
     # Seeded spherical k-means++; corpus only, never question labels.
     centers=[documents[torch.randint(len(documents),(1,),generator=g).item()]]
+    nearest_distance=None
     for _ in range(1,k):
-        distances=(1-documents@torch.stack(centers).T).min(-1).values.clamp_min(0).square()
+        if incremental:
+            # Same k-means++ criterion, updating only distance to the new center.
+            new_distance=(1-documents@centers[-1]).clamp_min(0)
+            nearest_distance=new_distance if nearest_distance is None else torch.minimum(nearest_distance,new_distance)
+            distances=nearest_distance.square()
+        else:
+            distances=(1-documents@torch.stack(centers).T).min(-1).values.clamp_min(0).square()
         if distances.sum()==0:raise ValueError('Not enough distinct directions')
         centers.append(documents[torch.multinomial(distances,1,generator=g).item()])
     centers=torch.stack(centers)
@@ -139,7 +146,7 @@ def run_regions(data,config,output):
     from .experiment import evaluate
     dense,dense_rows=evaluate(Policy(data['documents'].shape[1],'dense'),data,data['splits']['test'],1,len(data['documents']))
     for k in config['regions']:
-        t=time.perf_counter();centers,labels=partition(data['documents'],k,config['partition_seed'])
+        t=time.perf_counter();centers,labels=partition(data['documents'],k,config['partition_seed'],incremental=config.get('incremental_initialization',False))
         elapsed=time.perf_counter()-t
         targets=region_targets(data['qrels'],labels,k)
         sizes=torch.bincount(labels,minlength=k)

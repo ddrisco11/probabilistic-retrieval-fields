@@ -144,3 +144,15 @@ def test_compressed_measurements_roundtrip(tmp_path):
     summary=json.loads((tmp_path/'results.json').read_text())
     assert summary['results'][0]['p95_ms']==1.2
     assert 'per_query' not in summary['results'][0]
+
+
+def test_incremental_partition_initialization():
+    from prf.regions import partition
+    torch.set_num_threads(1)
+    docs=F.normalize(torch.randn(40,9,generator=torch.Generator().manual_seed(31)),dim=-1)
+    a,la=partition(docs,6,incremental=False)
+    b,lb=partition(docs,6,incremental=True)
+    assert torch.equal(la,lb)
+    assert torch.allclose(a,b)
+    _,again=partition(docs,6,incremental=True)
+    assert torch.equal(lb,again)

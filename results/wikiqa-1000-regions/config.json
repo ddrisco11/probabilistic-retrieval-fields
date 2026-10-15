@@ -1,0 +1,27 @@
+{
+  "regions": [
+    1000
+  ],
+  "probes": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "partition_seed": 2026,
+  "hidden": 64,
+  "epochs": 60,
+  "batch_size": 64,
+  "lr": 0.003,
+  "weight_decay": 0.01,
+  "incremental_initialization": true
+}

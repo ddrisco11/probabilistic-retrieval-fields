@@ -24,10 +24,10 @@ This is exploratory research. There is no assumed performance win, novelty claim
 - **Benchmark:** [Microsoft WikiQA](https://huggingface.co/datasets/microsoft/wiki_qa), with official question splits.
 - **Corpus:** 26,196 unique answer sentences, including negative candidates.
 - **Answerable questions:** 873 train / 126 validation / 243 test.
-- **Regions:** 8, 32, or 128 document-only spherical k-means cells.
+- **Regions:** 8, 32, 128, 1,000, 4,096, or 8,192 document-only spherical k-means cells.
 - **Router:** a 64-unit MLP residual over centroid similarities, trained on relevant-answer region distributions.
 - **Controls:** nearest centroid, largest regions, uniform random routing, and full-corpus dense retrieval.
-- **Budgets:** 1, 2, 4, 8, or 16 regions; three training seeds.
+- **Budgets:** powers of two up to 1,024 regions at the finest resolution; three training seeds.
 
 The searchable corpus combines answer sentences across splits. Questions without a labeled positive are excluded and counted. This is an adapted **global retrieval** task, not the candidate-restricted WikiQA leaderboard. Corpus construction sees answer text; training and checkpoint selection never use test relevance labels.
 
@@ -51,6 +51,24 @@ The learned-minus-centroid region-hit difference is −1.65 percentage points, w
 The complete measurements, per-query rankings, paired confidence intervals, training curves, exact revisions, and configurations are in [results/wikiqa-regions](results/wikiqa-regions). The [interactive explorer](https://ddrisco11.github.io/probabilistic-retrieval-fields/) changes partition granularity, number of regions searched, and the quality metric.
 
 High region accuracy alone is insufficient. Searching all regions yields perfect region coverage by construction. The useful comparison is quality **at a given fraction of the corpus searched**, alongside final answer-ranking quality.
+
+## Finer partitions
+
+The additional 1,000-, 4,096-, and 8,192-region runs took approximately **304 seconds total** on the local Mac, using cached BGE embeddings. This includes partitioning, training three seeds per resolution, and evaluation; it excludes the earlier embedding download/encoding. At 8,192 regions, the median region contains just two answer sentences.
+
+| Regions | Probes | Centroid region hit | Learned region hit | Corpus searched, centroid / learned |
+|---:|---:|---:|---:|---:|
+| 1,000 | 16 | 91.4% | 66.9% | 2.02% / 2.37% |
+| 4,096 | 64 | 97.9% | 69.3% | 2.51% / 2.87% |
+| 8,192 | 128 | 98.4% | 80.2% | 2.72% / 2.91% |
+
+These are similar-workload operating points, not exact budget matches. Finer granularity does not give this learned classifier an advantage. At 8,192 regions, only 869 regions contain a positive training answer; 84.6% of held-out positive answer occurrences belong to regions with no positive training example. Sparse supervision is a plausible limitation, not an isolated causal finding. At 1,024 probes both learned and centroid routing reach 99.6% region hit, while searching approximately 20% of the corpus.
+
+![Fine-granularity routing results](docs/assets/fine-granularity.png)
+
+The adapter predicts a categorical distribution over fixed answer regions from the query embedding. It can favor remote regions. Its loss rewards the labeled answer regions, without explicit neighboring-region credit. It does not generate continuous displacement vectors, and final answer ranking still uses the original query cosine. These results therefore test the region-classification implementation, not every possible probabilistic movement adapter.
+
+See the measured [1,000-region](results/wikiqa-1000-regions/summary.md), [4,096-region](results/wikiqa-4096-regions/summary.md), and [8,192-region](results/wikiqa-8192-regions/summary.md) runs. Each directory includes configurations, seed-level results, and per-query measurements. Reproduce each with the matching `configs/wikiqa-N-regions.json` passed to `python -m prf.regions`. The expanded sweep is exploratory: test results from earlier resolutions were already inspected, so a fresh benchmark is needed for confirmatory comparisons.
 
 ## Reproduce
 
