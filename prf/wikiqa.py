@@ -8,13 +8,13 @@ import torch
 QUERY_PREFIX='Represent this sentence for searching relevant passages: '
 
 
-def prepare(output, dataset_revision='main', model_revision='main'):
+def prepare(output, dataset_revision='main', model_revision='main', model_name='BAAI/bge-small-en-v1.5'):
     from huggingface_hub import HfApi, hf_hub_download
     from sentence_transformers import SentenceTransformer
     import pyarrow.parquet as pq
     torch.set_num_threads(4)
     api=HfApi()
-    dataset='microsoft/wiki_qa'; model_name='BAAI/bge-small-en-v1.5'
+    dataset='microsoft/wiki_qa'
     ds_sha=api.dataset_info(dataset,revision=dataset_revision).sha
     model_sha=api.model_info(model_name,revision=model_revision).sha
     files=api.list_repo_files(dataset,repo_type='dataset',revision=ds_sha)
@@ -75,4 +75,5 @@ if __name__=='__main__':
     import argparse
     p=argparse.ArgumentParser();p.add_argument('--output',default='cache/wikiqa-bge.pt')
     p.add_argument('--dataset-revision',default='main');p.add_argument('--model-revision',default='main')
-    a=p.parse_args();prepare(a.output,a.dataset_revision,a.model_revision)
+    p.add_argument('--model-name',default='BAAI/bge-small-en-v1.5')
+    a=p.parse_args();prepare(a.output,a.dataset_revision,a.model_revision,a.model_name)

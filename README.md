@@ -10,6 +10,22 @@ This project explores retrieval adaptation over **frozen BGE-small embeddings**.
 
 ![Question-to-region retrieval architecture](docs/assets/architecture.png)
 
+## Small-to-base vector field
+
+[Rotate the 2D/3D field](https://ddrisco11.github.io/probabilistic-retrieval-fields/vector-field.html) · [Measurements](results/wikiqa-vector-field/summary.md) · [Alignment and PCA protocol](docs/vector_field_protocol.md)
+
+Embed the same WikiQA texts with frozen BGE-small (384 dimensions) and BGE-base (768), align base into small's coordinates using training texts, and draw small-to-aligned-base arrows. Fit both endpoint PCA and displacement PCA on training data, then inspect held-out arrows. This compares representations of the same text; it is not a question-to-answer field.
+
+![Small-to-base field in two PCA dimensions](docs/assets/vector-field-2d.png)
+
+**The field has local structure, but is not well summarized by a few principal directions.** Neighboring origins have more similar centered displacement directions than random pairs (mean cosine 0.134 versus 0.0003). A ten-neighbor estimate reduces held-out displacement MSE by 10.2% versus a global-mean movement. The effect persists within questions (8.3%) and answer sentences (9.6%), so it is not solely a question/answer distinction. This supports investigating a local adapter, without yet demonstrating retrieval gains from predicted movements.
+
+The plots show partial question/answer separation and varied arrow directions. There is no dominant global translation: mean drift accounts for only 0.083% of held-out arrow energy. Even displacement-focused PCA retains only 1.4% of held-out centered movement energy in 2D and 2.1% in 3D. Spatial endpoint PCA retains 0.7% and 1.1% of arrow energy, respectively. Apparent low-dimensional patterns therefore need the full-space checks above; the figures do not establish semantic clusters, vortices, or a simple global flow.
+
+The 768→384 alignment retains 91.5% of held-out centered base embedding energy, which is not a measure of retained semantic information. Native base retrieval scores 0.762 nDCG@10 versus small's 0.728; the paired difference is +0.034, with 95% interval [+0.014, +0.055]. Aligned base scores 0.767, but base embeddings are still required for those endpoints. This does not establish an adapter that replaces base inference.
+
+All 26,196 answers and 3,047 questions were embedded. Alignment/PCA used 19,810 training texts; field statistics use 5,767 test texts after removing answers shared across splits. Base encoding took about 340 seconds and analysis about 6 seconds, using cached small embeddings. The viewer displays a seeded 500-point subset with actual projected arrow lengths; full measurements are saved separately.
+
 ## Continuous weighted projections
 
 The latest experiment directly predicts continuous destinations from each frozen query vector, with a learned weight for each destination. It uses **every weight**: the reward is the sum of each weight times negative squared distance to the relevant answer. There is no 95% cutoff. An optional sparse gate can learn exact zero weights, selecting an active subset of up to eight predictions.
