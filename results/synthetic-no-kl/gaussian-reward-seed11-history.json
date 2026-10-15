@@ -1,0 +1,242 @@
+[
+  {
+    "epoch": 0,
+    "loss": -0.00044909296557307246,
+    "validation_ndcg": 0.9426546776974704,
+    "objective": "reward",
+    "reward_mean": 0.257366411567394,
+    "reward_variance": 0.011560973550839527
+  },
+  {
+    "epoch": 1,
+    "loss": -0.0032846152782440184,
+    "validation_ndcg": 0.9782119224721563,
+    "objective": "reward",
+    "reward_mean": 0.2731401066347543,
+    "reward_variance": 0.010929710872731925
+  },
+  {
+    "epoch": 2,
+    "loss": -0.00450750368181616,
+    "validation_ndcg": 0.9905802654005146,
+    "objective": "reward",
+    "reward_mean": 0.28183673676459065,
+    "reward_variance": 0.012080131861711673
+  },
+  {
+    "epoch": 3,
+    "loss": -0.010314279515296221,
+    "validation_ndcg": 0.9902223822254396,
+    "objective": "reward",
+    "reward_mean": 0.2869968438527495,
+    "reward_variance": 0.012747442296339284
+  },
+  {
+    "epoch": 4,
+    "loss": -0.003148496709764004,
+    "validation_ndcg": 0.9893600749739653,
+    "objective": "reward",
+    "reward_mean": 0.2897014795582638,
+    "reward_variance": 0.012964419248002922
+  },
+  {
+    "epoch": 5,
+    "loss": -0.006058226246386767,
+    "validation_ndcg": 0.9903831671902843,
+    "objective": "reward",
+    "reward_mean": 0.2892152079600944,
+    "reward_variance": 0.012633485439636518
+  },
+  {
+    "epoch": 6,
+    "loss": -0.0025542519986629488,
+    "validation_ndcg": 0.9922393072475696,
+    "objective": "reward",
+    "reward_mean": 0.2906700046361139,
+    "reward_variance": 0.012594834752779368
+  },
+  {
+    "epoch": 7,
+    "loss": -0.002689190092496574,
+    "validation_ndcg": 0.9962608936440455,
+    "objective": "reward",
+    "reward_mean": 0.2913451589152424,
+    "reward_variance": 0.012609957852399652
+  },
+  {
+    "epoch": 8,
+    "loss": -0.010273031104588881,
+    "validation_ndcg": 0.996381944346917,
+    "objective": "reward",
+    "reward_mean": 0.29113618253743173,
+    "reward_variance": 0.01262632003832956
+  },
+  {
+    "epoch": 9,
+    "loss": -0.0030144472606480122,
+    "validation_ndcg": 0.997707377434395,
+    "objective": "reward",
+    "reward_mean": 0.2922252707034608,
+    "reward_variance": 0.012592585627890788
+  },
+  {
+    "epoch": 10,
+    "loss": -0.002582823159173131,
+    "validation_ndcg": 0.9984715849562633,
+    "objective": "reward",
+    "reward_mean": 0.2923498527767758,
+    "reward_variance": 0.012509627392526706
+  },
+  {
+    "epoch": 11,
+    "loss": -0.000711196893826127,
+    "validation_ndcg": 0.9984715849562633,
+    "objective": "reward",
+    "reward_mean": 0.29250256617605275,
+    "reward_variance": 0.012529768367314096
+  },
+  {
+    "epoch": 12,
+    "loss": -0.0024036077316850423,
+    "validation_ndcg": 0.9984715849562633,
+    "objective": "reward",
+    "reward_mean": 0.2921047074487433,
+    "reward_variance": 0.012517372340025871
+  },
+  {
+    "epoch": 13,
+    "loss": -0.0013849099981598557,
+    "validation_ndcg": 0.9980252424089677,
+    "objective": "reward",
+    "reward_mean": 0.29243022821740144,
+    "reward_variance": 0.01256748566388612
+  },
+  {
+    "epoch": 14,
+    "loss": -0.0009658291819505394,
+    "validation_ndcg": 0.997707377434395,
+    "objective": "reward",
+    "reward_mean": 0.29220115802147323,
+    "reward_variance": 0.012597300539250178
+  },
+  {
+    "epoch": 15,
+    "loss": -0.0026460595312528313,
+    "validation_ndcg": 0.9971070324193009,
+    "objective": "reward",
+    "reward_mean": 0.29254677266969037,
+    "reward_variance": 0.01257271757563961
+  },
+  {
+    "epoch": 16,
+    "loss": -0.0030645098304376006,
+    "validation_ndcg": 0.9971070324193009,
+    "objective": "reward",
+    "reward_mean": 0.2925829417266262,
+    "reward_variance": 0.012559526458334129
+  },
+  {
+    "epoch": 17,
+    "loss": -0.002368350327014923,
+    "validation_ndcg": 0.9980252424089677,
+    "objective": "reward",
+    "reward_mean": 0.29266733601171935,
+    "reward_variance": 0.012418605209939612
+  },
+  {
+    "epoch": 18,
+    "loss": -0.0012609622906893491,
+    "validation_ndcg": 0.9980252424089677,
+    "objective": "reward",
+    "reward_mean": 0.292691448612863,
+    "reward_variance": 0.012553743511072886
+  },
+  {
+    "epoch": 19,
+    "loss": -0.00232448591850698,
+    "validation_ndcg": 0.9980252424089677,
+    "objective": "reward",
+    "reward_mean": 0.2925869605710937,
+    "reward_variance": 0.012429792644679978
+  },
+  {
+    "epoch": 20,
+    "loss": -0.000272581132594496,
+    "validation_ndcg": 0.9983667027296109,
+    "objective": "reward",
+    "reward_mean": 0.2930410820990801,
+    "reward_variance": 0.012450007266756621
+  },
+  {
+    "epoch": 21,
+    "loss": -0.00010559771908447146,
+    "validation_ndcg": 0.9986197036780334,
+    "objective": "reward",
+    "reward_mean": 0.2931616453246938,
+    "reward_variance": 0.012458871019784224
+  },
+  {
+    "epoch": 22,
+    "loss": -0.0010780051932670176,
+    "validation_ndcg": 0.9986745669125218,
+    "objective": "reward",
+    "reward_mean": 0.2930008943399621,
+    "reward_variance": 0.012444218210231244
+  },
+  {
+    "epoch": 23,
+    "loss": -0.0007326979888603091,
+    "validation_ndcg": 0.9986745669125218,
+    "objective": "reward",
+    "reward_mean": 0.2929808005121433,
+    "reward_variance": 0.012432298810350245
+  },
+  {
+    "epoch": 24,
+    "loss": -0.0006337042432278395,
+    "validation_ndcg": 0.9986745669125218,
+    "objective": "reward",
+    "reward_mean": 0.2927035049845775,
+    "reward_variance": 0.012415991862782298
+  },
+  {
+    "epoch": 25,
+    "loss": -0.001114192802924663,
+    "validation_ndcg": 1.0,
+    "objective": "reward",
+    "reward_mean": 0.2927436927566305,
+    "reward_variance": 0.012495203322087506
+  },
+  {
+    "epoch": 26,
+    "loss": -0.0007424926152452826,
+    "validation_ndcg": 0.9986745669125218,
+    "objective": "reward",
+    "reward_mean": 0.29305313841905445,
+    "reward_variance": 0.012451564746924767
+  },
+  {
+    "epoch": 27,
+    "loss": -0.00041843228973448277,
+    "validation_ndcg": 0.9986197036780334,
+    "objective": "reward",
+    "reward_mean": 0.293101363737757,
+    "reward_variance": 0.012465494399280753
+  },
+  {
+    "epoch": 28,
+    "loss": 0.00031050113029778,
+    "validation_ndcg": 0.9985535162096504,
+    "objective": "reward",
+    "reward_mean": 0.2930410820990801,
+    "reward_variance": 0.012480148076753109
+  },
+  {
+    "epoch": 29,
+    "loss": -0.00020622462034225464,
+    "validation_ndcg": 0.9984715849562633,
+    "objective": "reward",
+    "reward_mean": 0.2931495890176545,
+    "reward_variance": 0.012457985947886809
+  }
+]

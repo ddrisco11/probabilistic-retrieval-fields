@@ -1,0 +1,45 @@
+{
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "models": [
+    "dense",
+    "deterministic",
+    "multi",
+    "perturb",
+    "gaussian",
+    "mixture"
+  ],
+  "strategies": [
+    "surrogate",
+    "reward",
+    "hybrid"
+  ],
+  "sample_budgets": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "candidate_budget": 40,
+  "selection_samples": 4,
+  "epochs": 30,
+  "batch_size": 32,
+  "train_samples": 4,
+  "hidden": 64,
+  "components": 4,
+  "prior_std": 0.15,
+  "regularization": 0,
+  "lr": 0.003,
+  "temperature": 0.1,
+  "threads": 1,
+  "synthetic": {
+    "seed": 2026,
+    "dim": 24,
+    "queries": 240,
+    "per_cluster": 24
+  }
+}

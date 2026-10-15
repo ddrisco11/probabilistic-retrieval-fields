@@ -1,0 +1,35 @@
+"""Offline explorer driven exclusively by saved measurements."""
+import json
+import numpy as np
+
+
+def write_report(payload,out):
+    compact={k:v for k,v in payload.items() if k!='results'}
+    compact['results']=[{k:v for k,v in r.items() if k!='per_query'} for r in payload['results']]
+    template=PathTemplate
+    (out/'explorer.html').write_text(template.replace('__DATA__',json.dumps(compact).replace('</','<\\/')))
+    lines=['# Measured results','','Exploratory; fixed configuration. Checkpoints selected on validation only.','',
+           '| Model | Samples | nDCG@10 mean ± seed SD | Candidate recall | Calls | Mean ms |',
+           '|---|---:|---:|---:|---:|---:|']
+    for label in sorted({r['model'] for r in payload['results']}):
+        for budget in sorted({r['requested_samples'] for r in payload['results']}):
+            rows=[r for r in payload['results'] if r['model']==label and r['requested_samples']==budget]
+            avg=lambda k:np.mean([r[k] for r in rows])
+            sd=np.std([r['ndcg@10'] for r in rows],ddof=1) if len(rows)>1 else 0
+            lines.append(f"| {label} | {budget} | {avg('ndcg@10'):.4f} ± {sd:.4f} | {avg('candidate_recall'):.4f} | {avg('index_calls'):.0f} | {avg('total_ms'):.3f} |")
+    (out/'summary.md').write_text('\n'.join(lines)+'\n')
+
+PathTemplate='''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRF experiment explorer</title>
+<style>:root{color-scheme:light dark;font:16px system-ui;background:light-dark(#f4f5ef,#141b1e);color:light-dark(#1b3035,#dce8eb)}body{max-width:1100px;margin:auto;padding:32px}h1{font-size:36px}p{line-height:1.6;max-width:850px}select{font:inherit;padding:8px;margin:10px}canvas{width:100%;height:350px}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:10px;border-bottom:1px solid #8885}.scroll{overflow:auto}pre{white-space:pre-wrap;font:13px monospace}.grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}section{margin:40px 0}@media(max-width:700px){body{padding:16px}.grid{grid-template-columns:1fr}h1{font-size:28px}}</style>
+<body><small>PROBABILISTIC RETRIEVAL FIELDS / EXPLORATORY EVIDENCE</small><h1>Does sampling earn its search cost?</h1><p>Frozen embeddings. Exact cosine search. A fixed returned-candidate budget, with actual search calls measured separately. Every value comes from saved experiments.</p>
+<label>Requested samples<select id="budget"></select></label><label>Metric<select id="metric"><option value="ndcg@10">nDCG@10</option><option value="recall@10">Recall@10</option><option value="candidate_recall">Candidate recall</option></select></label>
+<canvas id="quality" aria-label="Retrieval quality versus mean latency"></canvas><div class="scroll"><table><thead><tr><th>Model / objective</th><th>Quality ± seed SD</th><th>Calls</th><th>Unique candidates</th><th>Mean ms</th><th>p95 ms*</th><th>Parameters</th></tr></thead><tbody id="table"></tbody></table></div><p id="status" aria-live="polite"></p><small>*Seed-averaged p95. CPU timings include Python overhead.</small>
+<section><h2>Where do sampled locations land?</h2><label>Model / query type<select id="geometry"></select></label><div class="grid"><canvas id="space" aria-label="PCA projection of corpus and sampled locations"></canvas><div><p>Gray: corpus. Teal: relevant documents. Orange: samples. Cross: query. PCA is fit on documents only; it cannot establish meaningful modes.</p><pre id="diagnostics"></pre></div></div></section>
+<section><h2>Provenance</h2><pre id="provenance"></pre><p>Paired bootstrap intervals are saved in results.json. Seeds are averaged per query before bootstrapping. Intervals do not estimate uncertainty over datasets and are not corrected for multiple comparisons.</p></section>
+<script>
+const data=__DATA__;const $=id=>document.getElementById(id),mean=a=>a.reduce((x,y)=>x+y,0)/a.length,sd=a=>a.length<2?0:Math.sqrt(a.reduce((x,y)=>x+(y-mean(a))**2,0)/(a.length-1));const labels=[...new Set(data.results.map(r=>r.model))];const colors=['#217c87','#d87436','#7267af','#748a37','#b34e75','#3577af','#9b7229','#518773','#935f49','#7d7790'];
+[...new Set(data.results.map(r=>r.requested_samples))].forEach(b=>$('budget').add(new Option(b,b)));Object.keys(data.geometry).forEach(k=>$('geometry').add(new Option(k,k)));
+function context(id){let c=$(id),d=devicePixelRatio||1;c.width=c.clientWidth*d;c.height=350*d;let x=c.getContext('2d');x.scale(d,d);return [x,c.clientWidth]}
+function draw(){let b=+$('budget').value,m=$('metric').value;let rows=labels.map(l=>{let r=data.results.filter(x=>x.model===l&&x.requested_samples===b);return {label:l,q:mean(r.map(x=>x[m])),sd:sd(r.map(x=>x[m])),calls:mean(r.map(x=>x.index_calls)),unique:mean(r.map(x=>x.unique_candidates)),ms:mean(r.map(x=>x.total_ms)),p95:mean(r.map(x=>x.p95_ms)),params:r[0].trainable_parameters}});$('table').replaceChildren(...rows.map((r,i)=>{let tr=document.createElement('tr');[`${i+1}. ${r.label}`,r.q.toFixed(3)+' ± '+r.sd.toFixed(3),r.calls.toFixed(0),r.unique.toFixed(1),r.ms.toFixed(2),r.p95.toFixed(2),r.params].forEach(v=>{let td=document.createElement('td');td.textContent=v;tr.append(td)});return tr}));let [c,w]=context('quality'),fg=getComputedStyle(document.body).color,xmax=Math.max(...rows.map(r=>r.ms))*1.15;c.fillStyle=fg;c.strokeStyle=fg;c.font='12px system-ui';c.beginPath();c.moveTo(48,20);c.lineTo(48,300);c.lineTo(w-15,300);c.stroke();for(let i=0;i<=4;i++){c.fillText((i/4).toFixed(2),5,300-i/4*270);c.fillText((xmax*i/4).toFixed(2),48+i/4*(w-90),322)}c.fillText('Mean query latency (ms)',Math.max(48,w/2-60),345);c.fillText(m,54,16);rows.forEach((r,i)=>{let x=48+r.ms/xmax*(w-90),y=300-r.q*270;c.fillStyle=colors[i%colors.length];c.beginPath();c.arc(x,y,5,0,7);c.fill();c.fillStyle=fg;c.fillText(i+1,x+7,y-5)});$('status').textContent='Plot numbers follow table order. '+new Set(data.results.map(r=>r.seed)).size+' seeds; fixed held-out queries. Deterministic search calls are capped by available heads.'}
+function geometry(){let d=data.geometry[$('geometry').value],[c,w]=context('space'),points=[...d.documents,...d.samples,d.query],xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),xy=p=>[20+(p[0]-xmin)/(xmax-xmin||1)*(w-40),330-(p[1]-ymin)/(ymax-ymin||1)*300],dot=(p,color,r)=>{let [x,y]=xy(p);c.fillStyle=color;c.beginPath();c.arc(x,y,r,0,7);c.fill()},rel=new Set(d.relevant);d.documents.forEach((p,i)=>dot(p,rel.has(i)?'#217c87':'#8a929880',rel.has(i)?3:2));d.samples.forEach(p=>dot(p,'#d87436',3));let [x,y]=xy(d.query);c.strokeStyle=getComputedStyle(document.body).color;c.beginPath();c.moveTo(x-6,y);c.lineTo(x+6,y);c.moveTo(x,y-6);c.lineTo(x,y+6);c.stroke();$('diagnostics').textContent=JSON.stringify(d.diagnostics,null,2)}
+$('budget').onchange=draw;$('metric').onchange=draw;$('geometry').onchange=geometry;window.onresize=()=>{draw();geometry()};$('provenance').textContent=JSON.stringify(data.provenance,null,2);draw();geometry();</script></body></html>'''

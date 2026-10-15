@@ -1,0 +1,39 @@
+{
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "models": [
+    "dense",
+    "deterministic",
+    "multi",
+    "perturb",
+    "gaussian",
+    "mixture"
+  ],
+  "strategies": [
+    "surrogate",
+    "reward",
+    "hybrid"
+  ],
+  "sample_budgets": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "candidate_budget": 40,
+  "selection_samples": 4,
+  "epochs": 8,
+  "batch_size": 16,
+  "train_samples": 2,
+  "hidden": 64,
+  "components": 4,
+  "prior_std": 0.15,
+  "regularization": 0.001,
+  "lr": 0.001,
+  "temperature": 0.1,
+  "threads": 1
+}
